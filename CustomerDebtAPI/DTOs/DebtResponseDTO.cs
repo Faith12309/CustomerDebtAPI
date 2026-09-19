@@ -16,6 +16,7 @@
 
         public string Status { get; set; } = string.Empty;
 
+        public bool IsOverdue { get; set; }
         public string CreatedAt { get; set; } = string.Empty;
     }
 }

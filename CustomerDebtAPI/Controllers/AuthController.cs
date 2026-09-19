@@ -26,11 +26,28 @@ namespace CustomerDebtAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDTO login)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u =>
-                u.Username == login.Username &&
-                u.Password == login.Password);
+            if (string.IsNullOrWhiteSpace(login.Username) || string.IsNullOrWhiteSpace(login.Password))
+            {
+                return BadRequest("Username and password are required.");
+            }
+
+            var inputUsername = login.Username.Trim();
+            var inputPassword = login.Password.Trim();
+
+            // Step 1: find the user by username only (case-insensitive, trimmed).
+            // Pulling this into memory avoids any SQL-side collation/padding quirks.
+            var users = await _context.Users.ToListAsync();
+
+            var user = users.FirstOrDefault(u =>
+                u.Username.Trim().Equals(inputUsername, StringComparison.OrdinalIgnoreCase));
 
             if (user == null)
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            // Step 2: check the password separately, as a plain trimmed string comparison.
+            if (!user.Password.Trim().Equals(inputPassword, StringComparison.Ordinal))
             {
                 return Unauthorized("Invalid username or password.");
             }

@@ -9,7 +9,7 @@ namespace CustomerDebtAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+
     public class DebtController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -27,16 +27,6 @@ namespace CustomerDebtAPI.Controllers
                 .Include(d => d.Customer)
                 .ToListAsync();
 
-            foreach (var debt in debts)
-            {
-                if (debt.Status != "Paid" && debt.DueDate.Date < DateTime.Today)
-                {
-                    debt.Status = "Overdue";
-                }
-            }
-
-            await _context.SaveChangesAsync();
-
             var result = debts.Select(debt => new DebtResponseDTO
             {
                 Id = debt.Id,
@@ -46,6 +36,7 @@ namespace CustomerDebtAPI.Controllers
                 DueDate = debt.DueDate.ToString("yyyy-MM-dd"),
                 RemainingBalance = debt.RemainingBalance,
                 Status = debt.Status,
+                IsOverdue = debt.Status != "Paid" && debt.DueDate.Date < DateTime.Today,
                 CreatedAt = debt.CreatedAt.ToString("yyyy-MM-dd")
             });
 
@@ -74,6 +65,7 @@ namespace CustomerDebtAPI.Controllers
                 DueDate = debt.DueDate.ToString("yyyy-MM-dd"),
                 RemainingBalance = debt.RemainingBalance,
                 Status = debt.Status,
+                IsOverdue = debt.Status != "Paid" && debt.DueDate.Date < DateTime.Today,
                 CreatedAt = debt.CreatedAt.ToString("yyyy-MM-dd")
             };
 
@@ -112,6 +104,7 @@ namespace CustomerDebtAPI.Controllers
                 DueDate = debt.DueDate.ToString("yyyy-MM-dd"),
                 RemainingBalance = debt.RemainingBalance,
                 Status = debt.Status,
+                IsOverdue = debt.Status != "Paid" && debt.DueDate.Date < DateTime.Today,
                 CreatedAt = debt.CreatedAt.ToString("yyyy-MM-dd")
             };
 
@@ -192,6 +185,7 @@ namespace CustomerDebtAPI.Controllers
                 DueDate = debt.DueDate.ToString("yyyy-MM-dd"),
                 RemainingBalance = debt.RemainingBalance,
                 Status = debt.Status,
+                IsOverdue = debt.Status != "Paid" && debt.DueDate.Date < DateTime.Today,
                 CreatedAt = debt.CreatedAt.ToString("yyyy-MM-dd")
             };
 
@@ -233,6 +227,7 @@ namespace CustomerDebtAPI.Controllers
                 DueDate = debt.DueDate.ToString("yyyy-MM-dd"),
                 RemainingBalance = debt.RemainingBalance,
                 Status = debt.Status,
+                IsOverdue = debt.Status != "Paid" && debt.DueDate.Date < DateTime.Today,
                 CreatedAt = debt.CreatedAt.ToString("yyyy-MM-dd")
             });
 
@@ -258,6 +253,7 @@ namespace CustomerDebtAPI.Controllers
                 DueDate = debt.DueDate.ToString("yyyy-MM-dd"),
                 RemainingBalance = debt.RemainingBalance,
                 Status = debt.Status,
+                IsOverdue = true,
                 CreatedAt = debt.CreatedAt.ToString("yyyy-MM-dd")
             });
 
