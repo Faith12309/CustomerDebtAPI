@@ -44,6 +44,43 @@ namespace CustomerDebtAPI.Controllers
             return Ok(new { user.Id, user.Username, user.Role });
         }
 
+        // POST: api/User
+        [HttpPost]
+        public async Task<IActionResult> CreateUser(User newUser)
+        {
+            if (string.IsNullOrWhiteSpace(newUser.Username) ||
+                string.IsNullOrWhiteSpace(newUser.Password))
+            {
+                return BadRequest("Username and password are required.");
+            }
+
+            var exists = await _context.Users
+                .AnyAsync(u => u.Username.ToLower() == newUser.Username.Trim().ToLower());
+
+            if (exists)
+            {
+                return BadRequest("Username already exists.");
+            }
+
+            var user = new User
+            {
+                Username = newUser.Username.Trim(),
+                Password = newUser.Password.Trim(),
+                Role = string.IsNullOrWhiteSpace(newUser.Role) ? "Staff" : newUser.Role.Trim()
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+             
+            return Ok(new
+            {
+                message = "User created successfully.",
+                id = user.Id,
+                username = user.Username,
+                role = user.Role
+            });
+        }
+
         // PUT: api/User/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, User updatedUser)
